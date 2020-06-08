@@ -1,32 +1,29 @@
 package main
 
 import (
+	"fmt"
 	"os"
-	"os/exec"
-	"syscall"
-
-	rt "github.com/k82cn/myoci/pkg/runtime"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
+
+	"github.com/k82cn/myoci/cmd/app"
 
 	"k8s.io/klog"
 )
 
 func main() {
-	tty := true
-	cmd := "/bin/sh"
+	klog.InitFlags(nil)
+	defer klog.Flush()
 
-	Run(tty, cmd)
-	rt.RunContainerInitProcess(cmd, nil)
-}
-
-func Run(tty bool, command string) {
-	parent := rt.NewParentProcess(tty, command)
-	if err := parent.Start(); err != nil {
-		klog.Error(err)
+	rootCmd := cobra.Command{
+		Use: "myoci",
 	}
 
-	parent.Wait()
-	os.Exit(-1)
+	rootCmd.AddCommand(app.Run)
+	// rootCmd.AddCommand(initCmd())
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Printf("Failed to execute command: %v\n", err)
+		os.Exit(2)
+	}
 }
