@@ -27,6 +27,7 @@ func RunCommand() *cobra.Command {
 
 func setRunFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolVarP(&runFlags.Terminal, "terminal", "t", true, "true")
-	cmd.Flags().BoolVarP(&runFlags.Interactive, "interactive", "i", true, "true")
-	cmd.Flags().StringVarP(&runFlags.Command, "command", "c", "", "/bin/sh")
+	cmd.Flags().BoolVarP(&runFlags.Interactive, "interactive", "i", true, "")
+	cmd.Flags().StringVarP(&runFlags.Command, "command", "c", "", "The commands will run in container")
+	cmd.Flags().StringVarP(&runFlags.MemoryLimit, "memory", "m", "100m", "The cgroup of memory")
 }

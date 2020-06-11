@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"syscall"
 
+	"github.com/k82cn/myoci/pkg/subsystem"
 	"k8s.io/klog"
 )
 
@@ -13,6 +14,8 @@ type RunFlags struct {
 	Terminal    bool
 	Interactive bool
 	Command     string
+
+	subsystem.ResourceConfig
 }
 
 // Run run target command in container
@@ -21,6 +24,12 @@ func Run(flags *RunFlags) {
 	if err := parent.Start(); err != nil {
 		klog.Errorf("Failed to start parent process: %v", err)
 	}
+
+	cgroupManager := subsystem.NewManager("myoci-cgroup")
+	defer cgroupManager.Destroy()
+
+	cgroupManager.Set(&flags.ResourceConfig)
+	cgroupManager.Apply(parent.Process.Pid)
 
 	parent.Wait()
 	os.Exit(-1)
