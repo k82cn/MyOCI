@@ -19,8 +19,8 @@ func main() {
 		Use: "myoci",
 	}
 
-	rootCmd.AddCommand(app.Run)
-	// rootCmd.AddCommand(initCmd())
+	rootCmd.AddCommand(app.RunCommand())
+	rootCmd.AddCommand(app.InitCommand())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Printf("Failed to execute command: %v\n", err)
