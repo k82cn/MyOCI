@@ -48,7 +48,7 @@ func GetCgroupPath(subsystem string, cgroupPath string, autoCreate bool) (string
 				return "", err
 			}
 
-			return "", nil
+			return cgpath, nil
 		}
 
 		return "", err

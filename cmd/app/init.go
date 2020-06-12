@@ -14,9 +14,13 @@ func InitCommand() *cobra.Command {
 		Use:     "init",
 		Short:   "Init current process as container",
 		Long:    "Init current process as container",
-		Example: `myoci init -c /bin/sh`,
+		Example: `myoci init /bin/sh`,
 		Run: func(cmd *cobra.Command, args []string) {
-			// initFlags.Args = args
+			initFlags.Command = args[0]
+			if len(args) > 1 {
+				initFlags.Args = args[1:]
+			}
+
 			rt.RunContainerInitProcess(&initFlags)
 		},
 	}
@@ -27,5 +31,4 @@ func InitCommand() *cobra.Command {
 }
 
 func setInitFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&initFlags.Command, "command", "c", "", "command")
 }

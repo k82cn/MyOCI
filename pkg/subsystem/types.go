@@ -13,7 +13,7 @@ type Subsystem interface {
 	Remove(path string) error
 }
 
-var Subsystems = []Subsystem{
+var subsystemIns = []Subsystem{
 	&MemorySubsystem{},
 	// &CpusetSubsystem{},
 	// &CpuSubsystem{},

@@ -1,11 +1,13 @@
 package runtime
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"syscall"
 
 	"github.com/k82cn/myoci/pkg/subsystem"
+
 	"k8s.io/klog"
 )
 
@@ -14,6 +16,7 @@ type RunFlags struct {
 	Terminal    bool
 	Interactive bool
 	Command     string
+	Args        []string
 
 	subsystem.ResourceConfig
 }
@@ -23,9 +26,11 @@ func Run(flags *RunFlags) {
 	parent := newParentProcess(flags)
 	if err := parent.Start(); err != nil {
 		klog.Errorf("Failed to start parent process: %v", err)
+		return
 	}
 
-	cgroupManager := subsystem.NewManager("myoci-cgroup")
+	mgrID := fmt.Sprintf("myoci-cgroup-%d", parent.Process.Pid)
+	cgroupManager := subsystem.NewManager(mgrID)
 	defer cgroupManager.Destroy()
 
 	cgroupManager.Set(&flags.ResourceConfig)
@@ -36,13 +41,18 @@ func Run(flags *RunFlags) {
 }
 
 func newParentProcess(flags *RunFlags) *exec.Cmd {
-	args := []string{"init", "-c", flags.Command}
-
-	klog.Infof("command line args: %+v", args)
+	args := []string{"init", flags.Command}
+	if len(flags.Args) != 0 {
+		args = append(args, flags.Args...)
+	}
 
 	cmd := exec.Command("/proc/self/exe", args...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS | syscall.CLONE_NEWNET | syscall.CLONE_NEWIPC,
+		Cloneflags: syscall.CLONE_NEWUTS |
+			syscall.CLONE_NEWPID |
+			syscall.CLONE_NEWNS |
+			syscall.CLONE_NEWNET |
+			syscall.CLONE_NEWIPC,
 	}
 
 	if flags.Terminal || flags.Interactive {

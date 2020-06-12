@@ -14,7 +14,7 @@ func NewManager(path string) *Manager {
 }
 
 func (m *Manager) Apply(pid int) error {
-	for _, subSysIns := range Subsystems {
+	for _, subSysIns := range subsystemIns {
 		if err := subSysIns.Apply(m.Path, pid); err != nil {
 			klog.Errorf("Failed to apply cgrouop to %s for %d: %v", m.Path, pid, err)
 		}
@@ -24,7 +24,7 @@ func (m *Manager) Apply(pid int) error {
 }
 
 func (m *Manager) Set(res *ResourceConfig) error {
-	for _, subSysIns := range Subsystems {
+	for _, subSysIns := range subsystemIns {
 		if err := subSysIns.Set(m.Path, res); err != nil {
 			klog.Errorf("Failed to set cgroup to %s: %v", m.Path, err)
 		}
@@ -34,7 +34,7 @@ func (m *Manager) Set(res *ResourceConfig) error {
 }
 
 func (m *Manager) Destroy() error {
-	for _, subSysIns := range Subsystems {
+	for _, subSysIns := range subsystemIns {
 		if err := subSysIns.Remove(m.Path); err != nil {
 			klog.Errorf("Failed to remove cgroup %s: %v", m.Path, err)
 		}

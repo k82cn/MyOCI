@@ -16,6 +16,11 @@ func RunCommand() *cobra.Command {
 		Long:    "Run an image as container",
 		Example: `myoci run -it /bin/sh`,
 		Run: func(cmd *cobra.Command, args []string) {
+			runFlags.Command = args[0]
+			if len(args) > 1 {
+				runFlags.Args = args[1:]
+			}
+
 			rt.Run(&runFlags)
 		},
 	}
@@ -28,6 +33,5 @@ func RunCommand() *cobra.Command {
 func setRunFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolVarP(&runFlags.Terminal, "terminal", "t", true, "true")
 	cmd.Flags().BoolVarP(&runFlags.Interactive, "interactive", "i", true, "")
-	cmd.Flags().StringVarP(&runFlags.Command, "command", "c", "", "The commands will run in container")
-	cmd.Flags().StringVarP(&runFlags.MemoryLimit, "memory", "m", "100m", "The cgroup of memory")
+	cmd.Flags().StringVarP(&runFlags.MemoryLimit, "memory", "m", "2048m", "The cgroup of memory")
 }
